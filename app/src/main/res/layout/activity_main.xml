@@ -25,12 +25,27 @@
             android:text="History" />
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/etAmount"
-        android:hint="Enter gold (gram)"
-        android:inputType="numberDecimal"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/etAmount"
+            android:hint="Enter gold"
+            android:inputType="numberDecimal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"/>
+
+        <Spinner
+            android:id="@+id/spinnerUnit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnConvert"

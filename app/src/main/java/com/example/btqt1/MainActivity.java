@@ -1,6 +1,7 @@
 package com.example.btqt1;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -42,6 +43,9 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    Spinner spinnerUnit;
+
+    String[] units = {"Gram", "Luong", "Ounce"};
     EditText etAmount;
     Button btnConvert;
     TextView tvResult;
@@ -89,7 +93,15 @@ public class MainActivity extends AppCompatActivity {
         lineChart = findViewById(R.id.lineChart);
         btnConvert = findViewById(R.id.btnConvert);
         tvGoldInfo = findViewById(R.id.tvGoldInfo);
+        spinnerUnit = findViewById(R.id.spinnerUnit);
 
+        ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                units
+        );
+        unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerUnit.setAdapter(unitAdapter);
         Button btnHistory = findViewById(R.id.btnHistory);
         btnHistory.setOnClickListener(v -> showHistoryPopup());
 
@@ -141,11 +153,18 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
 
                     GoldResponse gold = response.body();
-                    String info = "Type: " + gold.name + "\n\n"
-                            + "Buy Price: " + String.format("%,d", (long) gold.buy) + " VND\n"
-                            + "Sell Price: " + String.format("%,d", (long) gold.sell) + " VND";
+                    String changeSymbol = gold.change_buy > 0 ? "↑" :
+                            gold.change_buy < 0 ? "↓" : "-";
 
+                    String info = gold.name + "\n"
+                            + "Buy: " + String.format("%,d", (long) gold.buy)
+                            + " (" + changeSymbol + String.format("%,d", (long) gold.change_buy) + ")\n"
+                            + "Sell: " + String.format("%,d", (long) gold.sell);
+
+                    info += "\nUpdated: " + gold.time + " " + gold.date;
                     tvGoldInfo.setText(info);
+
+
 
                     if (type.equals("XAUUSD")) {
                         goldPriceUSD = gold.buy;
@@ -184,6 +203,14 @@ public class MainActivity extends AppCompatActivity {
         if (input.isEmpty()) return;
 
         double amount = Double.parseDouble(input);
+        String unit = units[spinnerUnit.getSelectedItemPosition()];
+
+
+        if (unit.equals("Luong")) {
+            amount = amount * 37.5;
+        } else if (unit.equals("Ounce")) {
+            amount = amount * 31.1035;
+        }
         String selectedType = goldCodes[spinnerGoldType.getSelectedItemPosition()];
 
         double result;
@@ -196,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             double usdToVnd = 24000;
-            result = amount * goldPriceUSD * usdToVnd;
+            result = convertGoldToVND(goldPriceUSD, amount);
 
         } else {
 

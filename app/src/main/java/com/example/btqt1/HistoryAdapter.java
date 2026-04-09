@@ -33,6 +33,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.tvLine2.setText(String.format("%,d VND", (long) record.result));
     }
 
+
     @Override
     public int getItemCount() {
         return records.size();
